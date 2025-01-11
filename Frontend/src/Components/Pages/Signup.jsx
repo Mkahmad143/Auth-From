@@ -1,17 +1,27 @@
 import { motion } from "motion/react";
 import React from "react";
 import Input from "../UI/Input";
-import { User, Mail, Lock } from "lucide-react";
+import { User, Mail, Lock, Loader } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PasswordStrengthMeter from "../UI/PasswordStrengthMeter";
+import { useAuthStore } from "../../../Store/authStore";
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const handleSubmit = (e) => {
+  const { signup, error, isLoading } = useAuthStore();
+  const navigate = useNavigate();
+
+  //?Sending to backend
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      await signup(name, email, password);
+      navigate("/verify-email");
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <motion.main
@@ -46,6 +56,7 @@ const Signup = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          {error && <p className="mt-2 font-semibold text-red-500">{error}</p>}
           <PasswordStrengthMeter password={password} />
           <motion.button
             className="w-full px-4 py-3 mt-5 text-xl font-semibold text-white transition duration-200 rounded-lg shadow-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900"
@@ -54,7 +65,11 @@ const Signup = () => {
             type="submit"
             disabled={isLoading}
           >
-            Sign Up
+            {isLoading ? (
+              <Loader className="mx-auto animate-spin" size={24} />
+            ) : (
+              "Sign Up"
+            )}
           </motion.button>
         </form>
       </div>

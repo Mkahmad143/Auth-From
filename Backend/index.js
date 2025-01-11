@@ -4,9 +4,17 @@ import { connectionToDatabase } from "./DB/connectDB.js";
 dotenv.config();
 import authRoutes from "./Routes/authRoute.js";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 const app = express();
+//?Cors Config
 
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 //?Middleware
 app.use(express.json());
 app.use(cookieParser());
